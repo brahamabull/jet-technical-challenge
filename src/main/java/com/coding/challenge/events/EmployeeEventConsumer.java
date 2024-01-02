@@ -15,7 +15,7 @@ public class EmployeeEventConsumer {
     @Autowired
     private EmployeeService employeeService;
 
-    @KafkaListener(topics = "${kafka.topic.employee-events}")
+    @KafkaListener(topics = "${kafka.topic.employee-events}", groupId = "group_id")
     public void handleEmployeeEvent(String eventJson) {
         // Parse the payload and handle the event
         ObjectMapper objectMapper = new ObjectMapper();
