@@ -18,10 +18,11 @@ public class EmployeeEventConsumer {
     @KafkaListener(topics = "${kafka.topic.employee-events}", groupId = "group_id")
     public void handleEmployeeEvent(String eventJson) {
         // Parse the payload and handle the event
+        log.info("Event Received At Consumer Side as {}", eventJson);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             EmploymentEndedEvent event = objectMapper.readValue(eventJson, EmploymentEndedEvent.class);
-            log.info("Event Received At Consumer Side as {}", event);
+            log.info("Employee Event Mapped as : {}", event);
         } catch (JsonProcessingException e) {
             log.error("Error in Processing Event {} at Consumer Side : {}", eventJson, e.getMessage());
         }
