@@ -1,7 +1,6 @@
 package com.coding.challenge.service.impl;
 
 import com.coding.challenge.entity.Employee;
-import com.coding.challenge.events.EmploymentEndedEvent;
 import com.coding.challenge.events.KafkaProducerService;
 import com.coding.challenge.repository.EmployeeRepository;
 import com.coding.challenge.service.EmployeeService;
@@ -82,12 +81,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             return false;
         }
 
-        // Remove the employee
-        employeeRepository.deleteById(uuid);
-
         // Publish delete event
         kafkaProducerService.publishEmployeeEvent("EmployeeDeleted", uuid);
-
         return true;
     }
 }

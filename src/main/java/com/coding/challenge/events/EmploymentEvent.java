@@ -1,9 +1,6 @@
 package com.coding.challenge.events;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -11,10 +8,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class EmploymentEndedEvent {
+@Builder
+public class EmploymentEvent {
     private String eventId;
     private String employeeId;
     private LocalDateTime terminationRequestedAt;
     private LocalDateTime lastDayAtWork;
     private String reason;
+    private String eventType;
 }

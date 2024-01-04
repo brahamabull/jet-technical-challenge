@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @Tag(name = "Authentication", description = "The Authentication API. Contains operations like login, logout, refresh-token etc. " +
-        "This is non authenticated Urls and Can be used without any authentication ot Token")
+        "This is non authenticated Urls and Can be used without any authentication or Token")
 @RestController
 @RequestMapping("/api/v1/auth")
 @SecurityRequirements()
