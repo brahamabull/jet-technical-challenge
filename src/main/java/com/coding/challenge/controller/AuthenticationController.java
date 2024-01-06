@@ -1,9 +1,9 @@
 package com.coding.challenge.controller;
 
-import com.coding.challenge.payload.request.AuthenticationRequest;
+import com.coding.challenge.payload.request.LoginRequest;
 import com.coding.challenge.payload.request.RefreshTokenRequest;
 import com.coding.challenge.payload.request.RegisterRequest;
-import com.coding.challenge.payload.response.AuthenticationResponse;
+import com.coding.challenge.payload.response.LoginResponse;
 import com.coding.challenge.payload.response.RefreshTokenResponse;
 import com.coding.challenge.service.AuthenticationService;
 import com.coding.challenge.service.JwtService;
@@ -31,7 +31,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 @SecurityRequirements()
 /*
-This API won't have any security requirements. Therefore, we need to override the default security requirement configuration
+This API won't have any security requirements.
+Therefore, we need to override the default security requirement configuration
 with @SecurityRequirements()
 */
 @RequiredArgsConstructor
@@ -55,8 +56,8 @@ public class AuthenticationController {
                     )
             }
     )
-    public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody RegisterRequest request) {
-        AuthenticationResponse authenticationResponse = authenticationService.register(request);
+    public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
+        LoginResponse authenticationResponse = authenticationService.register(request);
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getAccessToken());
         ResponseCookie refreshTokenCookie = refreshTokenService.generateRefreshTokenCookie(authenticationResponse.getRefreshToken());
         return ResponseEntity.ok()
@@ -79,8 +80,8 @@ public class AuthenticationController {
                     )
             }
     )
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
+    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginRequest request) {
+        LoginResponse authenticationResponse = authenticationService.authenticate(request);
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getAccessToken());
         ResponseCookie refreshTokenCookie = refreshTokenService.generateRefreshTokenCookie(authenticationResponse.getRefreshToken());
         return ResponseEntity.ok()

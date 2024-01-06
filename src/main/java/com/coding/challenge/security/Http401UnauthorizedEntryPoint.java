@@ -34,9 +34,9 @@ public class Http401UnauthorizedEntryPoint implements AuthenticationEntryPoint {
                 .path(request.getServletPath())
                 .build();
         final ObjectMapper mapper = new ObjectMapper();
-        // register the JavaTimeModule, which enables Jackson to support Java 8 and higher date and time types
+        // This enables Jackson to support Java 8 and higher date and time types
         mapper.registerModule(new JavaTimeModule());
-        // ask Jackson to serialize dates as strings in the ISO 8601 format
+        // This will serialize dates as strings in the ISO 8601 format
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
         mapper.writeValue(response.getOutputStream(), body);
     }

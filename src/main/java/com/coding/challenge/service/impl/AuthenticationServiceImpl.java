@@ -2,9 +2,9 @@ package com.coding.challenge.service.impl;
 
 import com.coding.challenge.entity.UserInfo;
 import com.coding.challenge.enums.TokenType;
-import com.coding.challenge.payload.request.AuthenticationRequest;
+import com.coding.challenge.payload.request.LoginRequest;
 import com.coding.challenge.payload.request.RegisterRequest;
-import com.coding.challenge.payload.response.AuthenticationResponse;
+import com.coding.challenge.payload.response.LoginResponse;
 import com.coding.challenge.repository.UserRepository;
 import com.coding.challenge.service.AuthenticationService;
 import com.coding.challenge.service.JwtService;
@@ -17,9 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-
-@Service @Transactional
+@Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -29,7 +28,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
     @Override
-    public AuthenticationResponse register(RegisterRequest request) {
+    public LoginResponse register(RegisterRequest request) {
         var user = UserInfo.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
@@ -46,7 +45,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .map(SimpleGrantedAuthority::getAuthority)
                 .toList();
 
-        return AuthenticationResponse.builder()
+        return LoginResponse.builder()
                 .accessToken(jwt)
                 .email(user.getEmail())
                 .id(user.getId())
@@ -57,7 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public LoginResponse authenticate(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword()));
 
@@ -68,7 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .toList();
         var jwt = jwtService.generateToken(user);
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
-        return AuthenticationResponse.builder()
+        return LoginResponse.builder()
                 .accessToken(jwt)
                 .roles(roles)
                 .email(user.getEmail())

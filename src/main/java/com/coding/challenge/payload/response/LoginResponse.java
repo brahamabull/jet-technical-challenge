@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationResponse {
+public class LoginResponse {
     private  Long id;
     private String email;
     private List<String> roles;

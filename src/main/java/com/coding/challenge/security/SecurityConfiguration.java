@@ -58,7 +58,6 @@ public class SecurityConfiguration {
                                         "/swagger-ui/**",
                                         "/webjars/**",
                                         "/swagger-ui.html"
-
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/v1/resource").hasRole("ADMIN")
                                 .anyRequest().authenticated())
@@ -86,8 +85,6 @@ public class SecurityConfiguration {
         config.setMaxAge(MAX_AGE);
         source.registerCorsConfiguration("/**", config);
         FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-
-        // should be set order to -100 because we need to CorsFilter before SpringSecurityFilter
         bean.setOrder(CORS_FILTER_ORDER);
         return bean;
     }

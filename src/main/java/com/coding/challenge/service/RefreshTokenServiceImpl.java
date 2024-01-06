@@ -1,4 +1,4 @@
-package com.coding.challenge.security;
+package com.coding.challenge.service;
 
 import com.coding.challenge.entity.RefreshToken;
 import com.coding.challenge.entity.UserInfo;
@@ -8,8 +8,6 @@ import com.coding.challenge.payload.request.RefreshTokenRequest;
 import com.coding.challenge.payload.response.RefreshTokenResponse;
 import com.coding.challenge.repository.RefreshTokenRepository;
 import com.coding.challenge.repository.UserRepository;
-import com.coding.challenge.service.JwtService;
-import com.coding.challenge.service.RefreshTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

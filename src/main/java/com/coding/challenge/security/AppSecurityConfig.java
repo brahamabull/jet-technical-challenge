@@ -15,13 +15,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @RequiredArgsConstructor
-public class ApplicationSecurityConfig {
+public class AppSecurityConfig {
 
     private final UserRepository userRepository;
 
     /**
-     * we provide an implementation of the UserDetailsService functional interface, which has a loadByUsername method
-     * throws UsernameNotFoundException */
+     * Get the username
+     * @return userdata
+     */
     @Bean
     public UserDetailsService userDetailsService(){
         return username -> userRepository.findByEmail(username)
