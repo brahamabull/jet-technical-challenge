@@ -2,19 +2,28 @@ package com.coding.challenge.test.testIT;
 
 import com.coding.challenge.entity.Employee;
 import com.coding.challenge.enums.Role;
+import com.coding.challenge.events.EmployeeEventConsumer;
+import com.coding.challenge.events.EmploymentEvent;
 import com.coding.challenge.payload.request.LoginRequest;
 import com.coding.challenge.payload.request.RegisterRequest;
 import com.coding.challenge.service.EmployeeService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,20 +34,35 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
+@DirtiesContext
+@EmbeddedKafka(partitions = 1, bootstrapServersProperty = "spring.kafka.bootstrap-servers",
+        brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
 @ActiveProfiles("test")
-public class EmployeeControllerItTest {
+public class EmployeeControllerITCase {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private EmployeeService employeeService;
+
+    @SpyBean
+    private EmployeeEventConsumer employeeEventConsumer;
+
+    @Value("${kafka.topic.employee-events}")
+    private String topic;
+
+    @Captor
+    ArgumentCaptor<String> topicArgumentCaptor;
 
     @Test
     public void getAllEmployeeItTest() throws Exception {
@@ -119,6 +143,17 @@ public class EmployeeControllerItTest {
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$.fullName").value("John Cena"))
                 .andExpect(jsonPath("$.email").value("johncena@someemail.com"));
+
+        verify(employeeEventConsumer, timeout(1000).times(1)).handleEmployeeEvent(topicArgumentCaptor.capture());
+        String eventMessage = topicArgumentCaptor.getValue();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        try {
+            EmploymentEvent event = objectMapper.readValue(eventMessage, EmploymentEvent.class);
+            assertThat(event.getEventType()).isEqualTo("EmployeeCreated");
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -237,6 +272,16 @@ public class EmployeeControllerItTest {
                 .andExpect(jsonPath("$.email").value("testEmailLstNm@someemail.com"))
                 .andExpect(jsonPath("$.uuid").isNotEmpty()).andReturn();
 
+        verify(employeeEventConsumer, timeout(1000).times(2)).handleEmployeeEvent(topicArgumentCaptor.capture());
+        String eventMessage = topicArgumentCaptor.getValue();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        try {
+            EmploymentEvent event = objectMapper.readValue(eventMessage, EmploymentEvent.class);
+            assertThat(event.getEventType()).isEqualTo("EmployeeUpdated");
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -294,6 +339,17 @@ public class EmployeeControllerItTest {
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
+        verify(employeeEventConsumer, timeout(1000).times(2)).handleEmployeeEvent(topicArgumentCaptor.capture());
+        String eventMessage = topicArgumentCaptor.getValue();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        try {
+            EmploymentEvent event = objectMapper.readValue(eventMessage, EmploymentEvent.class);
+            assertThat(event.getEventType()).isEqualTo("EmployeeDeleted");
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
         this.mockMvc.perform(MockMvcRequestBuilders.get("/employees/" + uuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + bearerToken)
@@ -306,9 +362,9 @@ public class EmployeeControllerItTest {
     @Test
     public void deleteITTestNoEmployeeFound() throws Exception {
         RegisterRequest request = createRequest2();
-        request.setEmail("rickflair@someemail.com");
-        request.setFirstname("Rick");
-        request.setLastname("Flair");
+        request.setEmail("testUser9@someemail.com");
+        request.setFirstname("Test");
+        request.setLastname("User");
         ObjectMapper mapper = new ObjectMapper();
         this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -320,7 +376,7 @@ public class EmployeeControllerItTest {
                 .andExpect(status().isOk());
 
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("rickflair@someemail.com");
+        loginRequest.setEmail("testUser9@someemail.com");
         loginRequest.setPassword("test123");
         MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/authenticate")
                         .contentType(MediaType.APPLICATION_JSON)

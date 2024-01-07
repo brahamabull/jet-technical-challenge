@@ -73,3 +73,25 @@ For detailed documentation and testing of the APIs, access the Swagger UI by vis
 ```
 http://localhost:8080/swagger-ui.html
 ```
+
+# Important Notes :
+
+There are 2 forms of tests case 
+1. Junit Test cases which houses under test -> java -> com.coding.challenge.test.junittest
+2. Integration test cases which houses under -> java -> com.coding.challenge.test.testIT
+
+For running individual test cases  are possible. There is no need for any configuration to be used for this. 
+
+In case you find the below-mentioned issue while running test cases :
+
+``
+Could not configure topics
+org.springframework.kafka.KafkaException: Timed out waiting to get existing
+topics; nested exception is java.util.concurrent.TimeoutException
+``
+
+Then please comment the section @Bean Newtopic from the KafkaTopicConfig.java
+
+# Future Scopes (Not covered in here) :
+1. The kafka messages for other operations, other than delete can be effectively utilized.
+2. Integration with any IAM Servers like Keycloak can also be used.

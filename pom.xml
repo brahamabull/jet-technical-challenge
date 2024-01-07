@@ -157,6 +157,26 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>3.2.3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+						<configuration>
+							<includes>
+								<include>**/IT*.java</include>
+								<include>**/*IT.java</include>
+								<include>**/*ITCase.java</include>
+								<include>**/*IntegrationTest.java</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
