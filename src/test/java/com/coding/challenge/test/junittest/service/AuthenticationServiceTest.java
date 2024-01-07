@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -104,7 +105,7 @@ public class AuthenticationServiceTest {
         refreshToken.setToken("token");
         refreshToken.setRevoked(false);
         refreshToken.setId(2L);
-        refreshToken.setExpiryDate(Instant.now());
+        refreshToken.setExpiryDate(LocalDateTime.now());
         refreshToken.setUser(user);
         return refreshToken;
     }

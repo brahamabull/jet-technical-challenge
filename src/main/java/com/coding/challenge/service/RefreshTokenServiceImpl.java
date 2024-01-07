@@ -17,7 +17,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.WebUtils;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,7 +42,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .revoked(false)
                 .user(user)
                 .token(Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes()))
-                .expiryDate(Instant.now().plusMillis(refreshExpiration))
+                .expiryDate(LocalDateTime.now().plusMinutes(refreshExpiration))
                 .build();
         return refreshTokenRepository.save(refreshToken);
     }
@@ -53,7 +53,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             log.error("Token is null");
             throw new TokenException(null, "Token is null");
         }
-        if(token.getExpiryDate().compareTo(Instant.now()) < 0 ){
+        if(token.getExpiryDate().compareTo(LocalDateTime.now()) < 0 ){
             refreshTokenRepository.delete(token);
             throw new TokenException(token.getToken(), "Refresh token was expired. Please make a new authentication request");
         }
