@@ -25,6 +25,7 @@ public class KafkaProducerService {
     public void publishEmployeeEvent(String eventType, String employeeId) {
         log.info("Sending Event to Kafka with eventType {} and Employee Id {} ", eventType, employeeId);
         String payload = null;
+        ObjectWriter objectWriter = new ObjectMapper().registerModule(new JavaTimeModule()).writer().withDefaultPrettyPrinter();
         if ("EmployeeDeleted".equalsIgnoreCase(eventType)) {
             EmploymentEvent employmentEvent = new EmploymentEvent.EmploymentEventBuilder()
                     .eventId(UUID.randomUUID().toString())
@@ -35,15 +36,22 @@ public class KafkaProducerService {
                     .reason("Employee has presented a resignation letter")
                     .build();
             try {
-                ObjectWriter ow = new ObjectMapper().registerModule(new JavaTimeModule())
-                        .writer().withDefaultPrettyPrinter();
-                payload = ow.writeValueAsString(employmentEvent);
+                payload = objectWriter.writeValueAsString(employmentEvent);
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                log.error("Json Parsing Exception for Employment Event");
             }
             kafkaTemplate.send(employeeEventsTopic, payload);
         } else {
-            payload = "{eventType:" + eventType + ",employeeId:" + employeeId + ",eventId:" + UUID.randomUUID() + "}";
+            OtherGenericEvent otherGenericEvent = new OtherGenericEvent.OtherGenericEventBuilder()
+                    .employeeId(employeeId)
+                    .eventId(UUID.randomUUID().toString())
+                    .eventType(eventType)
+                    .build();
+            try {
+                payload = objectWriter.writeValueAsString(otherGenericEvent);
+            } catch (JsonProcessingException e) {
+                log.error("Json Parsing Exception for Generic Event");
+            }
             kafkaTemplate.send(employeeEventsTopic, payload);
         }
     }

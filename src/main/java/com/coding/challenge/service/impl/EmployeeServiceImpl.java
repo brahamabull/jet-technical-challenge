@@ -51,7 +51,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee updateEmployee(String uuid, Employee employee) {
-        Employee emp = getEmployeeById(employee.getUuid());
+        Employee emp = getEmployeeById(uuid);
         // Check if the employee exists
         if (Objects.isNull(emp)) {
             return null;

@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import jakarta.servlet.http.Cookie;
 import org.junit.Test;
-import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,7 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AuthenticationIntegrationTest {
 
     @Autowired
@@ -46,7 +44,6 @@ public class AuthenticationIntegrationTest {
     private JwtService jwtService;
 
     @Test
-    @Order(1)
     public void registerUserItTest() throws Exception {
         RegisterRequest request = createRequest();
         ObjectMapper mapper = new ObjectMapper();
@@ -66,7 +63,6 @@ public class AuthenticationIntegrationTest {
     }
 
     @Test
-    @Order(2)
     public void authenticateUserItTest() throws Exception {
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("johncena@someemail.com");
@@ -88,7 +84,6 @@ public class AuthenticationIntegrationTest {
     }
 
     @Test
-    @Order(3)
     public void refreshTokenItTest() throws Exception {
         RegisterRequest request = createRequest2();
         ObjectMapper mapper = new ObjectMapper();
